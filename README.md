@@ -2,8 +2,11 @@
 Satzung der Fachschaft Informatik mit Quellen und Abhängigkeiten.
 In Markdown um Änderungen schnell einsetzen zu können.
 
+[Aktueller Stand per GitHub Pages](https://roffinator3000.github.io/Satzungen)
+
 ## FSR Informatik
 ##### [pdf](./pdf/Inf):
+  - 2/2023 : https://drive.google.com/drive/folders/14a89hIW9pSCb3D4C3ob2Yw29-PcHmQQi (offiziell?)
   - 4/2022 : https://www.h-brs.de/de/ordnungen-der-studierendenschaft#opus-year-2022
 
 ## StuPa
