@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Satzung der Fachschaft Informatik</title>
+  <title>Satzung FSR Informatik</title>
   
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
@@ -30,7 +30,6 @@
       color: var(--text);
     }
 
-    /* Neu hinzugefügt für das Grid-Layout (Desktop) */
     .app {
       display: grid;
       grid-template-columns: 320px 1fr;
@@ -67,7 +66,6 @@
       gap: 8px;
     }
     
-    /* Links im Menü anpassen */
     .file-item {
       text-decoration: none;
       color: var(--text);
@@ -131,9 +129,6 @@
 
     .viewer {
       background: rgba(19, 26, 42, .86);
-      border: 1px solid var(--border);
-      border-radius: 22px;
-      box-shadow: var(--shadow);
       overflow: hidden;
     }
 
@@ -214,7 +209,7 @@
       color: var(--muted);
     }
 
-.content table {
+    .content table {
       width: 100%;
       border-collapse: collapse;
       margin-bottom: 1em;
@@ -253,28 +248,22 @@
   </style>
 </head>
 <body>
-
   <div class="app">
     <aside class="sidebar">
       <div class="brand">
-        <h1>Fachschaft Informatik</h1>
-        <p>Dokumenten-Viewer</p>
+        <h1>Fachschaftsrat Informatik</h1>
+        <p>WIP: Satzung</p>
+        <br>
+        <p>Anzeige:</p>
+        <p id="viewer-status">Bereit</p>
       </div>
       <div class="file-list" id="file-list">
         </div>
     </aside>
 
     <main class="main">
-      <div class="toolbar">
-        <div class="toolbar-left">
-          <span class="pill" id="current-file-badge">Keine Datei gewählt</span>
-        </div>
-      </div>
 
       <div class="viewer">
-        <div class="status">
-          <span id="viewer-status">Bereit</span>
-        </div>
         <div class="content" id="markdown-content">
           Bitte wähle eine Datei aus der Seitenleiste.
         </div>
@@ -289,7 +278,7 @@
     const badgeEl = document.getElementById('current-file-badge');
     const statusEl = document.getElementById('viewer-status');
 
-    // 2. Funktion zum Laden der Dateiliste über die GitHub API
+    // Laden der Dateiliste über die GitHub API
     async function fetchFileList() {
       statusEl.textContent = "Lade Dateiliste...";
       try {
@@ -319,7 +308,6 @@
       }
     }
 
-    // 3. Menü aufbauen (wird aufgerufen, sobald die Liste geladen ist)
     function buildMenu(files) {
       fileListEl.innerHTML = ""; // Vorheriges leeren
       
@@ -349,7 +337,7 @@
       });
     }
 
-    // 4. Funktion zum Laden und Rendern des Datei-Inhalts
+    // Funktion zum Laden und Rendern des Datei-Inhalts
     async function loadMarkdownFile(filename, linkElement) {
       document.querySelectorAll('.file-item').forEach(el => el.classList.remove('active'));
       if(linkElement) linkElement.classList.add('active');
