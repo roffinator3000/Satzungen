@@ -118,28 +118,9 @@
       flex-wrap: wrap;
     }
 
-    .pill {
-      border: 1px solid var(--border);
-      background: var(--panel);
-      padding: 10px 14px;
-      border-radius: 999px;
-      color: var(--muted);
-      font-size: .92rem;
-    }
-
     .viewer {
       background: rgba(19, 26, 42, .86);
       overflow: hidden;
-    }
-
-    .status {
-      padding: 16px 20px;
-      border-bottom: 1px solid var(--border);
-      color: var(--muted);
-      font-size: .95rem;
-      background: rgba(255,255,255,.02);
-      display: flex;
-      justify-content: space-between;
     }
 
     .content {
@@ -227,7 +208,52 @@
     .muted {
       color: var(--muted);
     }
+    
+    /* Styling für die Buttons */
+    .toggle-btn {
+      background: var(--panel-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 8px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
 
+    .toggle-btn:hover {
+      background: var(--border);
+    }
+
+    /* Layout für den Sidebar-Kopfbereich */
+    .brand-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    /* Versteckte Sidebar */
+    .app.sidebar-closed {
+      grid-template-columns: 1fr;
+    }
+
+    .app.sidebar-closed .sidebar {
+      display: none;
+    }
+
+    /* Top-Bar im Hauptbereich (nur sichtbar, wenn Sidebar zu ist) */
+    .top-bar {
+      margin-bottom: 16px;
+      display: none; 
+    }
+
+    .app.sidebar-closed .top-bar {
+      display: flex;
+    }
+    
     @media (max-width: 920px) {
       .app {
         grid-template-columns: 1fr;
@@ -248,20 +274,27 @@
   </style>
 </head>
 <body>
-  <div class="app">
+  <div class="app" id="app-container">
+    
     <aside class="sidebar">
       <div class="brand">
-        <h1>Fachschaftsrat Informatik</h1>
+        <div class="brand-header">
+          <h1>Fachschaftsrat Informatik</h1>
+          <button class="toggle-btn" id="close-sidebar" title="Menü schließen">✖</button>
+        </div>
         <p>WIP: Satzung</p>
         <br>
         <p>Anzeige:</p>
         <p id="viewer-status">Bereit</p>
       </div>
       <div class="file-list" id="file-list">
-        </div>
+      </div>
     </aside>
 
     <main class="main">
+      <div class="top-bar">
+        <button class="toggle-btn" id="open-sidebar">☰ Menü öffnen</button>
+      </div>
 
       <div class="viewer">
         <div class="content" id="markdown-content">
@@ -269,14 +302,30 @@
         </div>
       </div>
     </main>
+    
   </div>
-    <script>
+
+  <script>
     const folderPath = "pages";
 
     const fileListEl = document.getElementById('file-list');
     const contentEl = document.getElementById('markdown-content');
-    const badgeEl = document.getElementById('current-file-badge');
+    const badgeEl = document.getElementById('current-file-badge'); // Kann null sein, falls nicht im HTML
     const statusEl = document.getElementById('viewer-status');
+    
+    // --- NEU: Sidebar Toggle Logik ---
+    const appContainer = document.getElementById('app-container');
+    const closeBtn = document.getElementById('close-sidebar');
+    const openBtn = document.getElementById('open-sidebar');
+
+    closeBtn.addEventListener('click', () => {
+      appContainer.classList.add('sidebar-closed');
+    });
+
+    openBtn.addEventListener('click', () => {
+      appContainer.classList.remove('sidebar-closed');
+    });
+    // ---------------------------------
 
     // Laden der Dateiliste über die GitHub API
     async function fetchFileList() {
@@ -289,8 +338,8 @@
         
         // Nur .md Dateien herausfiltern und alphabetisch sortieren
         const mdFiles = data
-          .filter(file => file.name.endsWith('.md'))
           .map(file => file.name)
+          .filter(file => file.endsWith('.md'))
           .sort();
 
         if (mdFiles.length === 0) {
@@ -326,6 +375,11 @@
         a.addEventListener('click', (e) => {
           e.preventDefault();
           loadMarkdownFile(filename, a);
+          
+          // Optional: Auf mobilen Geräten die Sidebar nach dem Klicken direkt schließen
+          if (window.innerWidth <= 920) {
+            appContainer.classList.add('sidebar-closed');
+          }
         });
 
         fileListEl.appendChild(a);
@@ -343,7 +397,9 @@
       if(linkElement) linkElement.classList.add('active');
 
       statusEl.textContent = "Lade Inhalt...";
-      badgeEl.textContent = `${folderPath}/${filename}`;
+      
+      // Fehlerbehebung: Nur setzen, wenn das Element existiert
+      if (badgeEl) badgeEl.textContent = `${folderPath}/${filename}`;
 
       try {
         const response = await fetch(`${folderPath}/${filename}`);
