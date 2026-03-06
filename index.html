@@ -291,8 +291,7 @@
       }
     }
   </style>
-</head>
-<body>
+</head><body>
   <div class="app" id="app-container">
     
     <aside class="sidebar">
@@ -330,7 +329,7 @@
 
     const fileListEl = document.getElementById('file-list');
     const contentEl = document.getElementById('markdown-content');
-    const badgeEl = document.getElementById('current-file-badge'); // Kann null sein, falls nicht im HTML
+    const badgeEl = document.getElementById('current-file-badge');
     const statusEl = document.getElementById('viewer-status');
     
     const appContainer = document.getElementById('app-container');
@@ -344,7 +343,6 @@
     openBtn.addEventListener('click', () => {
       appContainer.classList.remove('sidebar-closed');
     });
-    // ---------------------------------
 
     // Laden der Dateiliste über die GitHub API
     async function fetchFileList() {
@@ -379,7 +377,26 @@
     function buildMenu(files) {
       fileListEl.innerHTML = ""; // Vorheriges leeren
       
-      files.forEach((filename, index) => {
+      // "Alle anzeigen" Button
+      const allBtn = document.createElement('a');
+      allBtn.href = "#";
+      allBtn.className = "file-item";
+      allBtn.innerHTML = `
+        <span class="file-title" style="color: var(--accent-2);">SATZUNG</span>
+        <span class="file-path">Gesamtes Dokument</span>
+      `;
+      
+      allBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        loadAllMarkdownFiles(files, allBtn);
+        if (window.innerWidth <= 920) {
+          appContainer.classList.add('sidebar-closed');
+        }
+      });
+      
+      fileListEl.appendChild(allBtn);
+
+      files.forEach((filename) => {
         const a = document.createElement('a');
         a.href = "#";
         a.className = "file-item";
@@ -395,28 +412,24 @@
           e.preventDefault();
           loadMarkdownFile(filename, a);
           
-          // Optional: Auf mobilen Geräten die Sidebar nach dem Klicken direkt schließen
           if (window.innerWidth <= 920) {
             appContainer.classList.add('sidebar-closed');
           }
         });
 
         fileListEl.appendChild(a);
-
-        // Erste Datei standardmäßig laden
-        if (index === 0) {
-          loadMarkdownFile(filename, a);
-        }
       });
+
+      // Beim Starten direkt alle Dokumente laden
+      loadAllMarkdownFiles(files, allBtn);
     }
 
-    // Funktion zum Laden und Rendern des Datei-Inhalts
+    // Funktion zum Laden und Rendern einer EINZELNEN Datei
     async function loadMarkdownFile(filename, linkElement) {
       document.querySelectorAll('.file-item').forEach(el => el.classList.remove('active'));
       if(linkElement) linkElement.classList.add('active');
 
       statusEl.textContent = "Lade Inhalt...";
-      
       if (badgeEl) badgeEl.textContent = `${filename}`;
 
       try {
@@ -429,6 +442,41 @@
       } catch (error) {
         contentEl.innerHTML = `<h2 style="color: #ff7a7a;">Fehler beim Laden</h2>
                                <p>Die Datei <code>${folderPath}/${filename}</code> konnte nicht geladen werden.</p>`;
+        statusEl.textContent = "Fehler";
+      }
+    }
+
+    // Funktion zum Laden ALLER Dateien
+    async function loadAllMarkdownFiles(files, linkElement) {
+      document.querySelectorAll('.file-item').forEach(el => el.classList.remove('active'));
+      if(linkElement) linkElement.classList.add('active');
+
+      statusEl.textContent = "Lade alle Inhalte...";
+      if (badgeEl) badgeEl.textContent = "Gesamtes Dokument";
+
+      try {
+        // Lädt alle Dateien parallel herunter
+        const fetchPromises = files.map(filename => 
+          fetch(`${folderPath}/${filename}`).then(res => {
+            if (!res.ok) throw new Error(`HTTP Fehler bei ${filename}`);
+            return res.text();
+          })
+        );
+
+        const markdownTexts = await Promise.all(fetchPromises);
+        let combinedHtml = "";
+
+        // Fügt die Texte nacheinander zusammen
+        markdownTexts.forEach(text => {
+          combinedHtml += marked.parse(text);
+        });
+
+        contentEl.innerHTML = combinedHtml;
+        statusEl.textContent = "Alle geladen";
+      } catch (error) {
+        contentEl.innerHTML = `<h2 style="color: #ff7a7a;">Fehler beim Laden</h2>
+                               <p>Eine oder mehrere Dateien konnten nicht geladen werden.</p>
+                               <p class="muted">${error.message}</p>`;
         statusEl.textContent = "Fehler";
       }
     }
