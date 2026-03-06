@@ -4,6 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Satzung der Fachschaft Informatik</title>
+  
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
   <style>
     :root {
       --bg: #0b1020;
@@ -27,8 +30,23 @@
       color: var(--text);
     }
 
+    /* Neu hinzugefügt für das Grid-Layout (Desktop) */
+    .app {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      height: 100%;
+    }
+
+    .sidebar {
+      background: var(--panel);
+      border-right: 1px solid var(--border);
+      padding: 24px;
+      overflow-y: auto;
+      height: 100%;
+    }
+
     .brand {
-      margin-bottom: 18px;
+      margin-bottom: 24px;
     }
 
     .brand h1 {
@@ -48,11 +66,28 @@
       flex-direction: column;
       gap: 8px;
     }
+    
+    /* Links im Menü anpassen */
+    .file-item {
+      text-decoration: none;
+      color: var(--text);
+      padding: 12px;
+      border-radius: 12px;
+      background: rgba(255,255,255,.02);
+      border: 1px solid transparent;
+      transition: all 0.2s;
+    }
+    
+    .file-item:hover, .file-item.active {
+      background: var(--panel-2);
+      border-color: var(--border);
+    }
 
     .file-title {
       display: block;
       font-weight: 600;
       margin-bottom: 4px;
+      color: var(--accent);
     }
 
     .file-path {
@@ -65,6 +100,8 @@
     .main {
       min-width: 0;
       padding: 28px;
+      overflow-y: auto;
+      height: 100%;
     }
 
     .toolbar {
@@ -106,6 +143,8 @@
       color: var(--muted);
       font-size: .95rem;
       background: rgba(255,255,255,.02);
+      display: flex;
+      justify-content: space-between;
     }
 
     .content {
@@ -175,7 +214,7 @@
       color: var(--muted);
     }
 
-    .content table {
+.content table {
       width: 100%;
       border-collapse: collapse;
       margin-bottom: 1em;
@@ -214,6 +253,34 @@
   </style>
 </head>
 <body>
+
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <h1>Fachschaft Informatik</h1>
+        <p>Dokumenten-Viewer</p>
+      </div>
+      <div class="file-list" id="file-list">
+        </div>
+    </aside>
+
+    <main class="main">
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <span class="pill" id="current-file-badge">Keine Datei gewählt</span>
+        </div>
+      </div>
+
+      <div class="viewer">
+        <div class="status">
+          <span id="viewer-status">Bereit</span>
+        </div>
+        <div class="content" id="markdown-content">
+          Bitte wähle eine Datei aus der Seitenleiste.
+        </div>
+      </div>
+    </main>
+  </div>
     <script>
     const folderPath = "pages";
 
