@@ -271,6 +271,25 @@
         padding: 22px;
       }
     }
+    
+    @media print {
+      /* Versteckt den "Menü öffnen"-Button und die Leiste drumherum */
+      .top-bar, 
+      #open-sidebar, 
+      #close-sidebar {
+        display: none !important;
+      }
+
+      /* Versteckt auch die Seitenleiste komplett beim Drucken */
+      .sidebar {
+        display: none !important;
+      }
+
+      /* Sorgt dafür, dass der Text die volle Seitenbreite nutzt */
+      .app {
+        display: block !important;
+      }
+    }
   </style>
 </head>
 <body>
@@ -279,12 +298,13 @@
     <aside class="sidebar">
       <div class="brand">
         <div class="brand-header">
-          <h1>Fachschaftsrat Informatik</h1>
+          <h1>WIP: Satzung</h1>
           <button class="toggle-btn" id="close-sidebar" title="Menü schließen">✖</button>
         </div>
-        <p>WIP: Satzung</p>
+        <p>Fachschaftsrat Informatik</p>
         <br>
         <p>Anzeige:</p>
+        <p id="current-file-badge">Datei wählen</p>
         <p id="viewer-status">Bereit</p>
       </div>
       <div class="file-list" id="file-list">
@@ -293,7 +313,7 @@
 
     <main class="main">
       <div class="top-bar">
-        <button class="toggle-btn" id="open-sidebar">☰ Menü öffnen</button>
+        <button class="toggle-btn" id="open-sidebar" title="Menü öffnen">☰</button>
       </div>
 
       <div class="viewer">
@@ -313,7 +333,6 @@
     const badgeEl = document.getElementById('current-file-badge'); // Kann null sein, falls nicht im HTML
     const statusEl = document.getElementById('viewer-status');
     
-    // --- NEU: Sidebar Toggle Logik ---
     const appContainer = document.getElementById('app-container');
     const closeBtn = document.getElementById('close-sidebar');
     const openBtn = document.getElementById('open-sidebar');
@@ -336,7 +355,7 @@
         
         const data = await response.json();
         
-        // Nur .md Dateien herausfiltern und alphabetisch sortieren
+        // .md Dateien herausfiltern und alphabetisch sortieren
         const mdFiles = data
           .map(file => file.name)
           .filter(file => file.endsWith('.md'))
@@ -398,8 +417,7 @@
 
       statusEl.textContent = "Lade Inhalt...";
       
-      // Fehlerbehebung: Nur setzen, wenn das Element existiert
-      if (badgeEl) badgeEl.textContent = `${folderPath}/${filename}`;
+      if (badgeEl) badgeEl.textContent = `${filename}`;
 
       try {
         const response = await fetch(`${folderPath}/${filename}`);
