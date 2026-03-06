@@ -23,6 +23,9 @@
 
     * { box-sizing: border-box; }
     html, body { height: 100%; }
+    html {
+      scroll-behavior: smooth; 
+    }
     body {
       margin: 0;
       font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -446,7 +449,7 @@
       }
     }
 
-    // Funktion zum Laden ALLER Dateien
+    // Funktion zum Laden ALLER Dateien inkl. dynamischem Inhaltsverzeichnis
     async function loadAllMarkdownFiles(files, linkElement) {
       document.querySelectorAll('.file-item').forEach(el => el.classList.remove('active'));
       if(linkElement) linkElement.classList.add('active');
@@ -455,23 +458,63 @@
       if (badgeEl) badgeEl.textContent = "Gesamtes Dokument";
 
       try {
-        // Lädt alle Dateien parallel herunter
+        // Lädt alle Dateien parallel herunter, behält aber den Dateinamen bei
         const fetchPromises = files.map(filename => 
           fetch(`${folderPath}/${filename}`).then(res => {
             if (!res.ok) throw new Error(`HTTP Fehler bei ${filename}`);
-            return res.text();
+            return res.text().then(text => ({ filename, text }));
           })
         );
 
-        const markdownTexts = await Promise.all(fetchPromises);
+        const results = await Promise.all(fetchPromises);
         let combinedHtml = "";
 
-        // Fügt die Texte nacheinander zusammen
-        markdownTexts.forEach(text => {
-          combinedHtml += marked.parse(text);
+        // Baut das HTML zusammen
+        results.forEach(({ filename, text }) => {
+          // Prüfen, ob das die Inhalts-Datei ist
+          if (filename.toLowerCase().includes("01-inhalt")) {
+            // Platzhalter für das dynamische Inhaltsverzeichnis einfügen
+            combinedHtml += `<div id="dynamic-toc"></div>`;
+          } else {
+            combinedHtml += marked.parse(text);
+          }
         });
 
         contentEl.innerHTML = combinedHtml;
+
+        // Inhaltsverzeichnis (ToC) generieren
+        statusEl.textContent = "Erstelle Inhaltsverzeichnis";
+        const tocContainer = document.getElementById('dynamic-toc');
+        if (tocContainer) {
+          let tocHTML = "<h1>Satzung der Fachschaft Informatik</h1><br><h2>Inhaltsverzeichnis</h2><ul style='padding-left: 0;'>";
+          
+          // Alle Überschriften im gerenderten Text suchen (h2 und h3 sind meist relevant)
+          const headings = contentEl.querySelectorAll('h2, h3, h4');
+          
+          headings.forEach((heading) => {
+             // Die Überschrift des Inhaltsverzeichnisses selbst überspringen
+             if (heading.textContent === "Inhaltsverzeichnis") return;
+
+             // Falls marked.js keine ID vergeben hat, generieren wir eine
+             if (!heading.id) {
+               heading.id = heading.textContent.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-');
+             }
+             
+             // Einrückung basierend auf der Überschriften-Ebene (h2 = 0px, h3 = 20px, etc.)
+             const level = parseInt(heading.tagName.substring(1));
+             const indent = (level - 2) * 20; 
+
+             tocHTML += `<li style="margin-left: ${indent}px; list-style-type: none; margin-bottom: 8px;">
+                           <a href="#${heading.id}" style="color: var(--accent); text-decoration: none;">
+                             ${heading.textContent}
+                           </a>
+                         </li>`;
+          });
+          tocHTML += "</ul><hr style='border: 0; border-bottom: 1px solid var(--border); margin: 2em 0;'>";
+          
+          tocContainer.innerHTML = tocHTML;
+        }
+
         statusEl.textContent = "Alle geladen";
       } catch (error) {
         contentEl.innerHTML = `<h2 style="color: #ff7a7a;">Fehler beim Laden</h2>
