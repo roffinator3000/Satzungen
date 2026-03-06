@@ -486,14 +486,15 @@
         statusEl.textContent = "Erstelle Inhaltsverzeichnis";
         const tocContainer = document.getElementById('dynamic-toc');
         if (tocContainer) {
-          let tocHTML = "<h1>Satzung der Fachschaft Informatik</h1><br><h2>Inhaltsverzeichnis</h2><ul style='padding-left: 0;'>";
+          let tocHTML = "<h1>Satzung der Fachschaft Informatik</h1><br><h2>Inhalt</h2><ul style='padding-left: 0;'>";
           
           // Alle Überschriften im gerenderten Text suchen (h2 und h3 sind meist relevant)
           const headings = contentEl.querySelectorAll('h2, h3, h4');
           
           headings.forEach((heading) => {
              // Die Überschrift des Inhaltsverzeichnisses selbst überspringen
-             if (heading.textContent === "Inhaltsverzeichnis") return;
+             if (heading.textContent === "Inhalt") return;
+             if (heading.textContent === "Fachschaftsrat Informatik der Hochschule Bonn-Rhein-Sieg") return;
 
              // Falls marked.js keine ID vergeben hat, generieren wir eine
              if (!heading.id) {
