@@ -287,7 +287,13 @@
       .sidebar {
         display: none !important;
       }
-
+      
+      /* Seitenumbruch vor und nach dem Inhaltsverzeichnis, nur beim Drucken */
+      #dynamic-toc {
+          break-before: page;
+          break-after: page;
+        }
+        
       /* Sorgt dafür, dass der Text die volle Seitenbreite nutzt */
       .app {
         display: block !important;
