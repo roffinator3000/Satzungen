@@ -18,11 +18,12 @@
   <div class="app" id="app-container">
     
     <aside class="sidebar">
-      <div class="brand">
-        <div class="brand-header">
-          <h1>WIP: Satzung</h1>
-          <button class="toggle-btn" id="close-sidebar" title="Menü schließen">✖</button>
-        </div>
+      <div class="top-bar" style="display: flex; gap: 8px;">
+        <button class="toggle-btn" id="close-sidebar"  title="Menü schließen" >✖</button>
+        <button class="toggle-btn" id="reload-sidebar" title="Texte neu laden">🔄</button>
+      </div>
+      <div class="brand brand-header">
+        <h1>WIP: Satzung</h1>
         <p>Fachschaftsrat Informatik</p>
         <br>
         <p>Anzeige:</p>
@@ -34,8 +35,9 @@
     </aside>
 
     <main class="main">
-      <div class="top-bar">
-        <button class="toggle-btn" id="open-sidebar" title="Menü öffnen">☰</button>
+      <div class="top-bar" style="display: flex; gap: 8px;">
+        <button class="toggle-btn" id="open-sidebar" title="Menü öffnen"    >☰</button>
+        <button class="toggle-btn" id="reload-main"  title="Texte neu laden">🔄</button>
       </div>
 
       <div class="viewer">
