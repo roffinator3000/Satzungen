@@ -51,7 +51,7 @@ async function fetchFileList() {
         // 3. Inhalte für alle Dateien parallel laden und im Objekt speichern
         statusEl.textContent = "Lade Dokumenttexte...";
         const fetchPromises = mdFiles.map(async (fileObj) => {
-            const res = await fetch(fileObj.url);
+            const res = await fetch(`${fileObj.url}`);
             if (!res.ok) throw new Error(`Datei ${fileObj.name} konnte nicht heruntergeladen werden.`);
             
             // Speichert den Text direkt im Objekt (unser "Cache")
