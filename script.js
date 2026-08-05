@@ -27,7 +27,11 @@ async function fetchFileList() {
     try {
         // 1. Liste holen
         // ?ref=master stellt sicher, dass wir auf dem richtigen Branch suchen
-        const response = await fetch(`https://api.github.com/repos/roffinator3000/Satzungen/contents/pages?ref=master`);
+        // { cache: 'no-cache' } zwingt den Browser, bei jedem Aufruf dieser Funktion wirklich Github zu fragen
+        const response = await fetch(
+            `https://api.github.com/repos/roffinator3000/Satzungen/contents/pages?ref=master`, 
+            { cache: 'no-cache' }
+        );
         if (!response.ok) throw new Error("API-Limit erreicht oder Repo/Ordner nicht gefunden.");
         
         const data = await response.json();
